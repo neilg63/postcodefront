@@ -3,21 +3,79 @@ body {
   background-size: cover;
   background-attachment: fixed;
   min-height: 100vh;
+  color: white;
+}
+
+.plain li,
+.plain {
+  list-style: none;
+}
+
+.plain li {
+  margin: 0;
+}
+
+.horizontal {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  li {
+    padding: 0.5em;
+    strong,
+    em {
+      display: inline-block;
+      margin-right: 0.5em;
+    }
+  }
+}
+
+.surrounding {
+  li {
+    cursor: pointer;
+  }
+}
+
+.columns {
+  display: block;
+  columns: 16em auto;
+  column-gap: 3em;
+  li {
+    padding: 0 0 0.5em 0;
+  }
 }
 
 .map-container {
   position: relative;
 
-  .details {
+  .overlay-content {
     position: absolute;
-    bottom: 10vh;
-    left: 5vw;
+    top: -3em;
+    left: 2vw;
+    width: 10em;
     padding: 1em;
     background-color: rgba(0, 0, 0, 0.5);
-    color: white;
   }
   .vl-map {
     width: 100vw;
     height: 75vh;
+  }
+
+  .details {
+    position: relative;
+
+    @media (min-width: 50em) {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+      p {
+        margin: 0 1em;
+        &:first-child {
+          margin: 0 1em 0 0;
+        }
+        &:last-child {
+          margin: 0 0 0 1em;
+        }
+      }
+    }
   }
 }

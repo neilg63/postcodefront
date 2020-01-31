@@ -74,6 +74,15 @@ export const displayDMS = pair => {
   }
 }
 
+export const displayDec = pair => {
+  if (pair instanceof Array && pair.length === 2) {
+    const [px, py] = pair;
+    return [py, px].join(", ");
+  } else {
+    return "";
+  }
+}
+
 const showGeoLoc = (data, callback) => {
   if (data.coords) {
     callback(data.coords);
