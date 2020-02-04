@@ -1,0 +1,129 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('fonts/icomoon.eot?xraw8y');
+  src:  url('fonts/icomoon.eot?xraw8y#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?xraw8y') format('truetype'),
+    url('fonts/icomoon.woff?xraw8y') format('woff'),
+    url('fonts/icomoon.svg?xraw8y#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-star:before {
+  content: "\e90a";
+}
+.icon-key:before {
+  content: "\e90b";
+}
+.icon-cloud:before {
+  content: "\e90c";
+}
+.icon-compass:before {
+  content: "\e907";
+}
+.icon-envelope-open:before {
+  content: "\e903";
+}
+.icon-envelope-closed:before {
+  content: "\e904";
+}
+.icon-bulb:before {
+  content: "\e908";
+}
+.icon-point-of-interest:before {
+  content: "\e906";
+}
+.icon-diamond:before {
+  content: "\e90d";
+}
+.icon-heart:before {
+  content: "\f004";
+}
+.icon-checkmark-outline:before {
+  content: "\e909";
+}
+.icon-send:before {
+  content: "\e905";
+}
+.icon-power-switch:before {
+  content: "\e83e";
+}
+.icon-download:before {
+  content: "\e865";
+}
+.icon-upload:before {
+  content: "\e866";
+}
+.icon-magnifier:before {
+  content: "\e86f";
+}
+.icon-cross:before {
+  content: "\e870";
+}
+.icon-list:before {
+  content: "\e872";
+}
+.icon-chevron-up:before {
+  content: "\e873";
+}
+.icon-chevron-down:before {
+  content: "\e874";
+}
+.icon-arrow-up:before {
+  content: "\e877";
+}
+.icon-arrow-down:before {
+  content: "\e878";
+}
+.icon-cross-circle:before {
+  content: "\e880";
+}
+.icon-plus-circle:before {
+  content: "\e881";
+}
+.icon-frame-expand:before {
+  content: "\e88c";
+}
+.icon-frame-contract:before {
+  content: "\e88d";
+}
+.icon-cog:before {
+  content: "\e900";
+}
+.icon-sun-fill:before {
+  content: "\e901";
+}
+.icon-moon-fill:before {
+  content: "\e902";
+}
+.icon-spades:before {
+  content: "\e917";
+}
+.icon-clubs:before {
+  content: "\e918";
+}
+.icon-diamonds:before {
+  content: "\e919";
+}
+.icon-github:before {
+  content: "\eab0";
+}
+.icon-linkedin:before {
+  content: "\eac9";
+}
