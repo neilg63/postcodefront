@@ -2,6 +2,41 @@ export const deg2rad = deg => {
   return deg * (Math.PI / 180)
 }
 
+export const validUKPostcode = postcode => {
+  return /\b((?:(?:gir)|(?:[a-pr-uwyz])(?:(?:[0-9](?:[a-hjkpstuw]|[0-9])?)|(?:[a-hk-y][0-9](?:[0-9]|[abehmnprv-y])?)))) ?([0-9][abd-hjlnp-uw-z]{2})\b/i.test(postcode);
+}
+
+export const isNumeric = inval => {
+  let valid = false;
+  switch (typeof inval) {
+    case 'string':
+      if (/^\s*-?\d+/.test(inval)) {
+        valid = !isNaN(parseFloat(inval));
+      }
+      break;
+    case 'number':
+      valid = !isNaN(inval);
+      break;
+  }
+  return valid;
+}
+
+export const toDistUnits = (km, unit) => {
+  let str = "";
+  if (isNumeric(km)) {
+    const fv = parseFloat(km);
+    switch (unit) {
+      case 'yards':
+        str = Math.round(fv * (1000 / 0.9144)) + " yds";
+        break;
+      default:
+        str = Math.round(fv * 1000) + " m.";
+        break;
+    }
+  }
+  return str;
+};
+
 export const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
   const R = 6371; // Radius of the earth in km
   const dLat = deg2rad(lat2 - lat1);  // deg2rad below
@@ -67,7 +102,7 @@ export const displayDMS = pair => {
     const x = convertDDToDMS(px, true);
     const y = convertDDToDMS(py, false);
     const asDisplayString = dms =>
-      `${dms.deg}º ${dms.min}' ${dms.sec}" ${dms.dir}`;
+      `${dms.dir} ${dms.deg}º ${dms.min}' ${dms.sec}"`;
     return [asDisplayString(y), asDisplayString(x)].join(", ");
   } else {
     return "";
@@ -89,8 +124,8 @@ const showGeoLoc = (data, callback) => {
   }
 }
 
-const handleGeoLocError = error => {
-  console.log(error)
+const handleGeoLocError = () => {
+  //
 }
 
 export const fetchGeo = (callback) => {

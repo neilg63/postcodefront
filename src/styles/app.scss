@@ -1,9 +1,52 @@
+$dark-blue: #000066;
+
 body {
-  background-image: linear-gradient(0.5turn, #000000 0%, #000044 100%);
+  background-image: linear-gradient(0.5turn, #000000 0%, $dark-blue 100%);
   background-size: cover;
   background-attachment: fixed;
   min-height: 100vh;
   color: white;
+}
+
+#app,
+body,
+#app input,
+#app textarea {
+  font-family: Sintony, sans-serif;
+}
+
+.flex-rows {
+  display: flex;
+  flex-flow: row wrap;
+  dt {
+    margin: 0;
+    padding: 0 0.25em 0 0;
+  }
+  dd {
+    margin: 0 2em 0 0.5em;
+  }
+  dd:last-child {
+    margin-right: 0;
+  }
+}
+
+.map-container {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  > div.controls {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2000;
+  }
+  > .vl-map {
+    margin-top: 7.5em;
+    @media (min-width: 40em) {
+      margin-top: 2.5em;
+    }
+  }
 }
 
 .plain li,
@@ -20,7 +63,7 @@ body {
   flex-flow: row wrap;
   justify-content: center;
   li {
-    padding: 0.5em;
+    padding: 0.25em 0.5em;
     strong,
     em {
       display: inline-block;
@@ -29,9 +72,46 @@ body {
   }
 }
 
-.surrounding {
+.tabs {
+  display: flex;
+  flex-flow: row wrap;
+  width: 100%;
+  border-bottom: solid 1px white;
   li {
+    margin: 0 -0.5em -1px 0;
+    padding: 0.25em 1em 0.25em 0.75em;
+    border: solid 1px white;
+    border-top-left-radius: 0.75em;
+    border-top-right-radius: 0.75em;
+    background-color: $dark-blue;
     cursor: pointer;
+    &.active {
+      color: yellow;
+    }
+  }
+}
+
+ul.surrounding {
+  > li {
+    cursor: pointer;
+    border: solid 1px white;
+    border-radius: 1em;
+    margin: 0.25em 0.5em;
+    transition: all 0.333s ease-in-out;
+    &:hover {
+      color: yellow;
+    }
+    &.active {
+      border-color: yellow;
+      color: yellow;
+      transform: scale(1.1);
+    }
+    strong {
+      font-size: 0.9em;
+    }
+    em {
+      font-size: 0.8em;
+    }
   }
 }
 
@@ -44,26 +124,111 @@ body {
   }
 }
 
+.wikipedia-entries {
+  article {
+    margin: 0.75em 1em;
+    padding: 0.5em 2.5%;
+    border-bottom: dashed 1px white;
+    max-width: 60em;
+  }
+
+  article:first-child {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  article:last-child {
+    border-bottom: none;
+  }
+
+  a {
+    color: white;
+  }
+}
+
 .map-container {
   position: relative;
 
   .overlay-content {
     position: absolute;
+    border-radius: 0.5em;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.5);
     top: -3em;
     left: 2vw;
-    width: 10em;
+    width: 12em;
     padding: 1em;
     background-color: rgba(0, 0, 0, 0.5);
+    font-size: 1.5vw;
+    .coordinates {
+      position: relative;
+      p {
+        margin: 0 0 0 2.5em;
+      }
+      > i {
+        display: block;
+        position: absolute;
+        top: 0.125em;
+        left: 0;
+        &::before {
+          font-size: 2em;
+        }
+      }
+    }
+    @media (min-width: 40em) {
+      font-size: 1.25vw;
+    }
+    @media (min-width: 50em) {
+      font-size: 1vw;
+    }
+    @media (min-width: 80em) {
+      font-size: 0.8em;
+    }
+    p {
+      padding: 0;
+      margin: 0 0 0.25em 0;
+    }
+    p.postcode {
+      color: yellow;
+      font-weight: bold;
+      font-size: 1.25em;
+      margin: 0.25em 0;
+    }
   }
   .vl-map {
     width: 100vw;
     height: 75vh;
   }
 
-  .details {
+  .controls {
     position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
 
-    @media (min-width: 50em) {
+    p {
+      margin: 0.25em 1em;
+    }
+
+    input.textfield {
+      color: $dark-blue;
+      font-size: 1em;
+      &.search {
+        border: none;
+        border-radius: 1em;
+        padding: 0.125em 0.25em 0.125em 0.5em;
+        width: 10em;
+        line-height: 1em;
+      }
+    }
+
+    label {
+      display: inline-block;
+      font-size: 0.75em;
+      margin: 0 0.25em 0 0.5em;
+    }
+
+    @media (min-width: 40em) {
       display: flex;
       flex-flow: row nowrap;
       justify-content: center;
