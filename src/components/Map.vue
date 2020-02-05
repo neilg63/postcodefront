@@ -62,6 +62,7 @@
                 <p class="lat">{{ selected | showLatDMS }}</p>
                 <p class="lng">{{ selected | showLngDMS }}</p>
               </div>
+              <p class="hasZonePlace">{{ zonePlace }}</p>
               <p class="postcode">{{ zone.pc }}</p>
               <p class="locality">{{ zone | toLocale }}</p>
               <p class="country">{{ zone.c }}</p>
@@ -95,6 +96,7 @@ import {
   displayDec,
   fetchGeo,
   isNumeric,
+  cleanString,
   validUKPostcode
 } from "../lib/helpers";
 import { fetchNearest, fetchAddresses, fetchSurrounding } from "../api/fetch";
@@ -117,6 +119,7 @@ export default {
       center: [defaultCoords.lng, defaultCoords.lat],
       selected: [defaultCoords.lng, defaultCoords.lat],
       zone: zoneSchema,
+      zonePlace: "",
       surrounding: [],
       geonames: [],
       weather: weatherSchema,
@@ -145,6 +148,9 @@ export default {
     },
     hasZone() {
       return this.zone.pc.length > 1 || this.zone.pn.length > 1;
+    },
+    hasZonePlace() {
+      return this.zonePlace.trim().length > 1;
     },
     addresses() {
       let items = [];
@@ -228,18 +234,27 @@ export default {
         } else {
           val.pn = "";
         }
+        const cleanedW = cleanString(val.w);
+        const cleanedPn = cleanString(val.pn);
         if (val.w) {
-          if (val.w.length > 1 && val.w !== val.pn) {
+          if (
+            val.w.length > 1 &&
+            cleanedW !== cleanedPn &&
+            cleanedW.indexOf(cleanedPn) < 0
+          ) {
             parts.push(val.w);
           }
         }
         if (val.cy) {
-          if (val.cy.length > 1) {
+          if (
+            val.cy.length > 1 &&
+            cleanString(val.cy) !== cleanString(val.pn)
+          ) {
             parts.push(val.cy);
           }
         }
         if (val.r) {
-          if (val.r.length > 1 && val.r !== val.cy) {
+          if (val.r.length > 1 && cleanString(val.r) !== cleanString(val.cy)) {
             parts.push(val.r);
           }
         }
@@ -331,23 +346,35 @@ export default {
     fetchZones() {
       const [lng, lat] = this.selected;
       const params = { lng, lat };
+      this.findZoneData(params);
+    },
+    findZoneData(coords) {
+      this.zonePlace = "";
       this.zone = zoneSchema;
-      const nearest = this.matchNearest(params);
+      const nearest = this.matchNearest(coords);
       if (nearest.matched) {
         this.setZone(nearest.zone);
       } else {
+        const { lng, lat } = coords;
+        if (coords.name) {
+          this.zonePlace = coords.name;
+        }
         const ck =
           "near_" + parseFloat(lat).toFixed(6) + parseFloat(lng).toFixed(6);
         const data = this.$ls.get(ck);
         if (data instanceof Object) {
           this.handleZoneData(data);
         } else {
-          fetchNearest(params).then(d => this.handleZoneData(d, false, ck));
+          fetchNearest(coords).then(d => {
+            this.handleZoneData(d, false, ck);
+          });
         }
       }
     },
     fetchByPc() {
       if (this.search.length > 4) {
+        this.zonePlace = "";
+        this.zone = zoneSchema;
         const pc = this.search.trim().toUpperCase();
         if (validUKPostcode(pc) && pc !== this.zone.pc.trim().toUpperCase()) {
           const ck = "pc_" + pc.replace(/\s/, "_");
@@ -364,6 +391,7 @@ export default {
     },
     handleZoneData(d, recenter, ck) {
       if (d instanceof Object) {
+        this.zone = zoneSchema;
         this.geonames = [];
         this.poi = [];
         this.wikipedia = [];
@@ -408,7 +436,22 @@ export default {
           }
           if (d.hasWikiEntries > 0) {
             if (d.wikipedia instanceof Array) {
-              this.wikipedia = d.wikipedia;
+              this.wikipedia = d.wikipedia
+                .filter(w => {
+                  let v = false;
+                  if (w instanceof Object) {
+                    if (w.title && w.wikipediaUrl) {
+                      v = true;
+                    }
+                  }
+                  return v;
+                })
+                .map(w => {
+                  if (isNumeric(w.distance)) {
+                    w.distance = parseFloat(w.distance);
+                  }
+                  return w;
+                });
             }
           }
           if (!d.zone.pn) {

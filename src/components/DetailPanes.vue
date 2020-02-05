@@ -17,6 +17,16 @@
           {{ gn.name }}
         </li>
       </ol>
+      <ul v-if="hasPoi" class="plain horizontal points-of-interest">
+        <li
+          v-for="(p, pi) in filteredPoi"
+          :key="['poi', pi].join()"
+          @click="selectCoords(p)"
+        >
+          <span class="text">{{ p.name }}</span>
+          <em>{{ toDistUnits(p.distance) }}</em>
+        </li>
+      </ul>
       <ul v-if="hasOtherPcs" class="plain horizontal surrounding">
         <li
           v-for="(z, zi) in surrounding"
@@ -40,13 +50,7 @@
       <weather :weather="weather" />
     </div>
     <div v-if="selectedTab === 'wikipedia'" class="pane wikipedia-pane">
-      <div v-if="hasMoreInfo" class="wikipedia-entries">
-        <ul v-if="hasPoi" class="plain horizontal points-of-interest">
-          <li v-for="(p, pi) in filteredPoi" :key="['poi', pi].join()">
-            <span class="text">{{ p.name }}</span>
-            <em>{{ toDistUnits(p.distance) }}</em>
-          </li>
-        </ul>
+      <div v-if="hasWikiEntries" class="wikipedia-entries">
         <template v-for="(entry, ei) in wikipedia">
           <wiki-entry :entry="entry" :key="['wiki', ei].join('-')" />
         </template>
@@ -193,9 +197,6 @@ export default {
     hasWeather() {
       return hasWeatherData(this.weather);
     },
-    hasMoreInfo() {
-      return this.wikipedia.length > 0 || this.poi.length > 0;
-    },
     hasWikiEntries() {
       return this.wikipedia.length > 0;
     },
@@ -258,6 +259,9 @@ export default {
     },
     selectZone(zone) {
       this.$parent.selectZone(zone);
+    },
+    selectCoords(coords) {
+      this.$parent.findZoneData(coords);
     }
   }
 };

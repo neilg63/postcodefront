@@ -87,6 +87,13 @@ export const calcDegreesPerKm = coords => {
   }
 };
 
+export const cleanString = str => {
+  if (typeof str === 'string') {
+    str = str.trim().toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, '-');
+  }
+  return str;
+}
+
 export const convertDDToDMS = (dd = 0.0, lng = false) => {
   return {
     dir: dd < 0 ? lng ? 'W' : 'S' : lng ? 'E' : 'N',

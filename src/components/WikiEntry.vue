@@ -1,6 +1,10 @@
 <template>
   <article class="entry">
-    <p>
+    <h4>
+      <a :href="href" ref="external" target="_blank">{{ title }}</a>
+      <em>({{ displayDistance }})</em>
+    </h4>
+    <p v-if="hasSummary">
       <span class="text" v-html="summary"></span>
       <a :href="href" ref="external" target="_blank">...more</a>
     </p>
@@ -8,7 +12,7 @@
 </template>
 <script>
 import { wikipediaSchema } from "../api/schemas";
-
+import { toDistUnits } from "../lib/helpers";
 export default {
   name: "WikiEntry",
   props: {
@@ -33,6 +37,23 @@ export default {
         href = this.toHref(this.entry.wikipediaUrl);
       }
       return href;
+    },
+    hasSummary() {
+      return this.summary.length > 8;
+    },
+    title() {
+      let str = "";
+      if (this.entry.title) {
+        str = this.entry.title.trim();
+      }
+      return str;
+    },
+    displayDistance() {
+      let str = "";
+      if (this.entry.distance) {
+        str = toDistUnits(this.entry.distance);
+      }
+      return str;
     }
   },
   methods: {
