@@ -6,12 +6,18 @@
         :key="['tab', ti].join('-')"
         @click="selectTab(tab)"
         :class="tabClasses(tab)"
+        :title="tab.description"
       >
         {{ tab.label }}
       </li>
     </ul>
     <div v-if="selectedTab === 'nearby'" class="pane pc-pane">
-      <ul v-if="hasSurrounding" class="plain horizontal surrounding">
+      <ol v-if="hasGeonames" class="plain horizontal geonames">
+        <li v-for="(gn, gi) in ascGeonames" :key="['geoname', gi].join('-')">
+          {{ gn.name }}
+        </li>
+      </ol>
+      <ul v-if="hasOtherPcs" class="plain horizontal surrounding">
         <li
           v-for="(z, zi) in surrounding"
           :key="['surrounding', zi].join('-')"
@@ -31,35 +37,16 @@
       </ul>
     </div>
     <div v-if="selectedTab === 'weather'" class="pane weather-pane">
-      <dl v-if="hasWeather" class="flex-rows weather">
-        <dt>
-          Temperature:
-        </dt>
-        <dd>
-          {{ weather.temperature }}
-        </dd>
-        <dt>
-          Humidity:
-        </dt>
-        <dd>
-          {{ weather.humidity }}
-        </dd>
-        <dt>
-          Station:
-        </dt>
-        <dd>
-          {{ weather.stationName }}
-        </dd>
-        <dt v-if="hasDate">
-          Date:
-        </dt>
-        <dd v-if="hasDate">
-          {{ datetime | dateFormat("DD/MM/YYYY HH:mm") }}
-        </dd>
-      </dl>
+      <weather :weather="weather" />
     </div>
     <div v-if="selectedTab === 'wikipedia'" class="pane wikipedia-pane">
-      <div v-if="hasWikiEntries" class="wikipedia-entries">
+      <div v-if="hasMoreInfo" class="wikipedia-entries">
+        <ul v-if="hasPoi" class="plain horizontal points-of-interest">
+          <li v-for="(p, pi) in filteredPoi" :key="['poi', pi].join()">
+            <span class="text">{{ p.name }}</span>
+            <em>{{ toDistUnits(p.distance) }}</em>
+          </li>
+        </ul>
         <template v-for="(entry, ei) in wikipedia">
           <wiki-entry :entry="entry" :key="['wiki', ei].join('-')" />
         </template>
@@ -69,13 +56,16 @@
 </template>
 <script>
 import { toDistUnits } from "../lib/helpers";
-import { weatherSchema } from "../api/schemas";
+import { weatherSchema, hasWeatherData } from "../api/schemas";
+import { isNumeric } from "../lib/helpers";
 import WikiEntry from "./WikiEntry";
+import Weather from "./Weather";
 
 export default {
   name: "DetailPanes",
   components: {
-    WikiEntry
+    WikiEntry,
+    Weather
   },
   props: {
     zone: {
@@ -107,6 +97,12 @@ export default {
         return [];
       }
     },
+    geonames: {
+      type: Array,
+      default() {
+        return [];
+      }
+    },
     poi: {
       type: Array,
       default() {
@@ -119,19 +115,23 @@ export default {
       tabs: [
         {
           key: "nearby",
-          label: "Nearby postcodes"
+          label: "Nearby",
+          description: "Toponyms and nearby postcodes (where available)"
         },
         {
           key: "addresses",
-          label: "Find addresses"
+          label: "Addresses",
+          description: "Addresses in this postcode area (where available)"
         },
         {
           key: "weather",
-          label: "Weather"
+          label: "Weather",
+          description: "Latest available nearby weather data"
         },
         {
           key: "wikipedia",
-          label: "Wikipedia"
+          label: "More info",
+          description: "Points of interest and wikipedia articles"
         }
       ],
       selectedTab: "nearby"
@@ -176,42 +176,58 @@ export default {
       return this.addresses.length > 0;
     },
     hasSurrounding() {
+      return this.surrounding.length > 0 || this.geonames.length > 0;
+    },
+    hasGeonames() {
+      return this.geonames.length > 0;
+    },
+    ascGeonames() {
+      return this.geonames.slice(0).reverse();
+    },
+    hasOtherPcs() {
       return this.surrounding.length > 0;
     },
     hasOtherSelected() {
       return this.surrounding.filter(z => z.pc === this.zone.pc).length > 0;
     },
     hasWeather() {
-      let valid = false;
-      if (this.weather instanceof Object) {
-        if (this.weather.stationName) {
-          valid = this.weather.stationName.length > 1;
-        }
-      }
-      return valid;
+      return hasWeatherData(this.weather);
+    },
+    hasMoreInfo() {
+      return this.wikipedia.length > 0 || this.poi.length > 0;
     },
     hasWikiEntries() {
       return this.wikipedia.length > 0;
     },
     hasPoi() {
-      return this.poi.length > 0;
+      return this.filteredPoi.length > 0;
     },
-    hasDate() {
-      if (this.hasWeather) {
-        if (/^\d\d\d\d-\d\d?-\d\d?/.test(this.weather.datetime)) {
-          return true;
-        }
-      }
-      return false;
-    },
-    datetime() {
-      let dt = new Date();
-      if (this.hasWeather) {
-        if (this.hasDate) {
-          dt = new Date(this.weather.datetime);
-        }
-      }
-      return dt;
+    filteredPoi() {
+      return this.poi
+        .filter(p => {
+          let valid = false;
+          if (p instanceof Object) {
+            if (p.distance) {
+              if (isNumeric(p.distance)) {
+                if (p.name) {
+                  valid = p.name.length > 1;
+                }
+              }
+            }
+          }
+          return valid;
+        })
+        .map(p => {
+          p.distance = parseFloat(p.distance);
+          p.classNames = [];
+          if (p.typeClass) {
+            p.classNames.push(p.typeClass.replace(/_/g, "-"));
+          }
+          if (p.typeName) {
+            p.classNames.push(p.typeName.replace(/_/g, "-"));
+          }
+          return p;
+        });
     }
   },
   filters: {},

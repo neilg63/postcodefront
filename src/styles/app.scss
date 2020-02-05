@@ -15,9 +15,38 @@ body,
   font-family: Sintony, sans-serif;
 }
 
+#app .geonames li {
+  position: relative;
+  padding-left: 1.2em;
+  margin-left: 1em;
+  &::before {
+    position: absolute;
+    top: 0.25em;
+    left: 0;
+    content: "\02192";
+    color: yellow;
+  }
+}
+
+#app .points-of-interest li {
+  position: relative;
+  padding-left: 1.2em;
+  margin-left: 1em;
+  &::before {
+    position: absolute;
+    font-family: icomoon;
+    top: 0.25em;
+    left: 0;
+    content: "\e906";
+    color: yellow;
+  }
+}
+
 .flex-rows {
   display: flex;
   flex-flow: row wrap;
+  justify-content: center;
+  padding: 0.5em 5%;
   dt {
     margin: 0;
     padding: 0 0.25em 0 0;
@@ -64,6 +93,7 @@ body,
   justify-content: center;
   li {
     padding: 0.25em 0.5em;
+    span,
     strong,
     em {
       display: inline-block;

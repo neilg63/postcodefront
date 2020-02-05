@@ -43,3 +43,13 @@ export const wikipediaSchema = {
   lat: 0,
   wikipediaUrl: ""
 }
+
+export const hasWeatherData = (weather) => {
+  let valid = false;
+  if (weather instanceof Object) {
+    if (weather.stationName) {
+      valid = weather.stationName.length > 1;
+    }
+  }
+  return valid;
+}
