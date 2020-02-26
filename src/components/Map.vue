@@ -12,26 +12,25 @@
           @keyup.enter="fetchByPc"
         />
       </p>
-      <p>
-        <label>Zoom</label
-        ><input type="range" v-model="zoomVal" min="6" max="23" step="1" />
+      <p class="zoom-level">
+        <label>Zoom</label>
+        <input type="range" v-model="zoomVal" min="6" max="23" step="1" />
         <strong class="value">{{ zoomInt }}</strong>
       </p>
       <p v-if="showRotation">
-        <label>Rotation</label
-        ><input
-          type="range"
-          v-model="rotateDegrees"
-          min="-180"
-          max="180"
-          step="15"
-        />
+        <label>Rotation</label>
+        <input type="range" v-model="rotateDegrees" min="-180" max="180" step="15" />
         <strong class="value">{{ rotateDegrees }}</strong>
       </p>
-      <p>
-        <strong class="value" :title="center | showDec">{{
+      <p class="coordinates">
+        <strong class="value" :title="center | showDec">
+          {{
           center | showDMS
-        }}</strong>
+          }}
+        </strong>
+      </p>
+      <p class="logo">
+        <a href="https://www.multifaceted.info" target="_blank"></a>
       </p>
     </div>
     <vl-map
@@ -40,19 +39,11 @@
       data-projection="EPSG:4326"
       @click="handleClick"
     >
-      <vl-view
-        :zoom.sync="zoom"
-        :center.sync="center"
-        :rotation.sync="rotation"
-      ></vl-view>
+      <vl-view :zoom.sync="zoom" :center.sync="center" :rotation.sync="rotation"></vl-view>
       <vl-feature v-if="showSelected">
         <vl-style-box>
           <vl-geom-point :coordinates="selected"></vl-geom-point>
-          <vl-style-icon
-            src="/images/pin.svg"
-            :anchor="[0.5, 1]"
-            :scale="markerScale"
-          ></vl-style-icon>
+          <vl-style-icon src="/images/pin.svg" :anchor="[0.5, 1]" :scale="markerScale"></vl-style-icon>
         </vl-style-box>
         <vl-overlay id="overlay" :position="selected">
           <template>

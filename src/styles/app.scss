@@ -259,9 +259,62 @@ ul.surrounding {
     justify-content: center;
     align-items: center;
     background-color: black;
+
+    .logo {
+      > a {
+        display: block;
+        width: 100%;
+        height: 2em;
+      }
+
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: contain;
+      height: 2em;
+      margin: 0 auto;
+      @media (max-width: 60em) {
+        position: absolute;
+        background-image: url("/images/mfws.svg");
+        width: 16vw;
+        margin: 0 auto 0.5em auto;
+        background-position: top right;
+        top: 0.5em;
+        right: 2%;
+        @media (min-width: 40em) {
+          width: 8vw;
+        }
+      }
+      @media (min-width: 60em) {
+        position: relative;
+        background-image: url("/images/logo.svg");
+        background-position: center right;
+        margin: 0 auto 0.5em auto;
+        width: 13.5em;
+      }
+      @media (min-width: 70em) {
+        position: relative;
+        background-position: center right;
+        margin: 0 auto 0.5em auto;
+        width: 15em;
+      }
+    }
+
     min-height: 2.5em;
     p {
       margin: 0.25em 1em;
+    }
+
+    .zoom-level {
+      @media (min-width: 40em) and (max-width: 50em) {
+        label {
+          display: none;
+        }
+      }
+      input {
+        @media (min-width: 40em) and (max-width: 60em) {
+          max-width: 5em;
+        }
+      }
     }
 
     input.textfield {
@@ -280,6 +333,16 @@ ul.surrounding {
       display: inline-block;
       font-size: 0.75em;
       margin: 0 0.25em 0 0.5em;
+    }
+
+    .coordinates {
+      font-size: 0.8em;
+      @media (min-width: 70em) {
+        font-size: 0.9em;
+      }
+      @media (min-width: 80em) {
+        font-size: 1em;
+      }
     }
 
     @media (min-width: 40em) {

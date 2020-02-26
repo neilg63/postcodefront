@@ -7,22 +7,14 @@
         @click="selectTab(tab)"
         :class="tabClasses(tab)"
         :title="tab.description"
-      >
-        {{ tab.label }}
-      </li>
+      >{{ tab.label }}</li>
     </ul>
     <div v-if="selectedTab === 'nearby'" class="pane pc-pane">
       <ol v-if="hasGeonames" class="plain horizontal geonames">
-        <li v-for="(gn, gi) in ascGeonames" :key="['geoname', gi].join('-')">
-          {{ gn.name }}
-        </li>
+        <li v-for="(gn, gi) in ascGeonames" :key="['geoname', gi].join('-')">{{ gn.name }}</li>
       </ol>
       <ul v-if="hasPoi" class="plain horizontal points-of-interest">
-        <li
-          v-for="(p, pi) in filteredPoi"
-          :key="['poi', pi].join()"
-          @click="selectCoords(p)"
-        >
+        <li v-for="(p, pi) in filteredPoi" :key="['poi', pi].join()" @click="selectCoords(p)">
           <span class="text">{{ p.name }}</span>
           <em>{{ toDistUnits(p.distance) }}</em>
         </li>
@@ -41,9 +33,7 @@
     </div>
     <div v-if="selectedTab === 'addresses'" class="pane address-pane">
       <ul v-if="hasAddresses" class="plain columns addresses">
-        <li v-for="(addr, ai) in addresses" :key="['address', ai].join('-')">
-          {{ addr }}
-        </li>
+        <li v-for="(addr, ai) in addresses" :key="['address', ai].join('-')">{{ addr }}</li>
       </ul>
     </div>
     <div v-if="selectedTab === 'weather'" class="pane weather-pane">
