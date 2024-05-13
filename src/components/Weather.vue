@@ -54,7 +54,9 @@ export default {
       let dt = new Date();
       if (this.hasWeather) {
         if (this.hasDate) {
-          dt = new Date(this.weather.datetime);
+          const dtStr = this.weather.datetime.trim().replace(/\s+/, "T").replace(/(:[0-5]\d)$/, "$1.000Z");
+          dt = new Date(dtStr);
+          console.log(dt, dtStr)
         }
       }
       return dt;
