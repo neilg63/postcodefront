@@ -26,7 +26,7 @@
 </template>
 <script>
 import { weatherSchema, hasWeatherData } from "../api/schemas";
-import { isNumeric } from "../lib/helpers";
+import { isNumeric, toISOUtcDateString } from "../lib/helpers";
 
 export default {
   name: "Weather",
@@ -54,9 +54,8 @@ export default {
       let dt = new Date();
       if (this.hasWeather) {
         if (this.hasDate) {
-          const dtStr = this.weather.datetime.trim().replace(/\s+/, "T").replace(/(:[0-5]\d)$/, "$1.000Z");
+          const dtStr = toISOUtcDateString(this.weather.datetime);
           dt = new Date(dtStr);
-          console.log(dt, dtStr)
         }
       }
       return dt;

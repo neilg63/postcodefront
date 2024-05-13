@@ -140,3 +140,12 @@ export const fetchGeo = (callback) => {
     navigator.geolocation.getCurrentPosition(data => showGeoLoc(data, callback), handleGeoLocError);
   }
 }
+
+export const toISOUtcDateString = (dtStr = "") => {
+  if (typeof dtStr === "string") {
+    return dtStr.trim().replace(/\s+/, "T").replace(/(:[0-5]\d)$/, "$1.000Z");
+  } else {
+    return dtStr;
+  }
+  
+}
