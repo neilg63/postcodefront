@@ -440,7 +440,7 @@ export default {
     checkSuggestions(e) {
       if (e.key) {
         const key = e.key.toLowerCase();
-        if (['backspace', 'enter', 'meta', 'arrowleft','arrowright', 'arrowup', 'arrowdown'].includes(key) === false) {
+        if (['enter', 'meta', 'arrowleft','arrowright', 'arrowup', 'arrowdown'].includes(key) === false) {
           if (this.search.length > 1 && !validUKPostcode(this.search) && !/^[A-Z][A-Z0-9]+/.test(this.search)) {
             this.getSuggestions();
           } else {
