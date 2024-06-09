@@ -14,9 +14,9 @@
         <li v-for="(gn, gi) in ascGeonames" :key="['geoname', gi].join('-')">{{ gn.name }}</li>
       </ol>
       <ul v-if="hasPoi" class="plain horizontal points-of-interest">
-        <li v-for="(p, pi) in filteredPoi" :key="['poi', pi].join()" @click="selectCoords(p)">
+        <li v-for="(p, pi) in filteredPoi" :key="['poi', pi].join('-')" @click="selectCoords(p)">
           <span class="text">{{ p.name }}</span>
-          <em>{{ toDistUnits(p.distance) }}</em>
+          <em>{{ toDistUnitsFromKm(p.distance) }}</em>
         </li>
       </ul>
       <ul v-if="hasOtherPcs" class="plain horizontal surrounding">
@@ -193,6 +193,13 @@ export default {
     hasPoi() {
       return this.filteredPoi.length > 0;
     },
+    isUK() {
+      if (this.hasZone && typeof this.zone.wc === 'string') {
+        return this.zone.wc.trim().length > 3;
+      } else {
+        return false
+      }
+    },
     filteredPoi() {
       return this.poi
         .filter(p => {
@@ -245,7 +252,10 @@ export default {
       return cls;
     },
     toDistUnits(vl) {
-      return toDistUnits(vl);
+      return toDistUnits(vl, 'm', !this.isUK);
+    },
+    toDistUnitsFromKm(vl) {
+      return toDistUnits(vl, 'm', true);
     },
     selectZone(zone) {
       this.$parent.selectZone(zone);

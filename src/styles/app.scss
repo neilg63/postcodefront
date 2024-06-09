@@ -299,6 +299,36 @@ ul.surrounding {
       }
     }
 
+    .item > .suggestions {
+      width: 100%;
+    }
+
+    .suggestions {
+      position: absolute;
+      top: 2rem;
+      left: 0;
+      opacity: 0;
+      background-color: black;
+      pointer-events: none;
+      &.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+      ul {
+        margin: 0;
+        padding: 0;
+        li {
+          list-style: none;
+          margin: 0;
+          padding: 0.25em;
+          cursor: pointer;
+          &:hover {
+            color: yellow;
+          }
+        }
+      }
+    }
+
     min-height: 2.5em;
     p {
       margin: 0.25em 1em;
@@ -317,6 +347,10 @@ ul.surrounding {
       }
     }
 
+    .item {
+      position: relative;
+    }
+
     input.textfield {
       color: $dark-blue;
       font-size: 1em;
@@ -326,6 +360,15 @@ ul.surrounding {
         padding: 0.125em 0.25em 0.125em 0.5em;
         width: 10em;
         line-height: 1em;
+        @media (min-width: 60em) {
+          width: 12em;
+        }
+        @media (min-width: 70em) {
+          width: 14em;
+        }
+        @media (min-width: 78em) {
+          width: 16em;
+        }
       }
     }
 

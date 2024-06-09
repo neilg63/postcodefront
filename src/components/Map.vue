@@ -1,17 +1,24 @@
 <template>
   <section class="map-container" :class="wrapperClasses">
     <div class="controls">
-      <p>
+      <div class="item">
         <input
           type="text"
           v-model="search"
           size="10"
           maxlength="32"
-          placeholder="Search"
+          placeholder="UK postcode or town/city around the world"
           class="textfield search"
           @keyup.enter="fetchByPc"
+          @keydown="checkSuggestions"
         />
-      </p>
+
+        <div class="suggestions" :class="suggestionsClasses">
+          <ul v-if="hasSuggestions">
+            <li v-for="(row, ri) in suggestions" :key="['sug', ri].join('-')" @click="goToNearest(row)">{{ row.text }}</li>
+          </ul>
+        </div>
+      </div>
       <p class="zoom-level">
         <label>Zoom</label>
         <input type="range" v-model="zoomVal" min="6" max="23" step="1" />
@@ -90,7 +97,7 @@ import {
   cleanString,
   validUKPostcode
 } from "../lib/helpers";
-import { fetchNearest, fetchAddresses, fetchSurrounding } from "../api/fetch";
+import { fetchNearest, fetchSugegstions, fetchSurrounding } from "../api/fetch";
 import DetailPanes from "./DetailPanes";
 import { weatherSchema, zoneSchema } from "../api/schemas";
 import { defaultCoords } from "../.env";
@@ -99,9 +106,6 @@ export default {
   name: "Map",
   components: {
     DetailPanes
-  },
-  props: {
-    msg: String
   },
   data() {
     return {
@@ -124,7 +128,8 @@ export default {
       units: {
         degrees: "dms",
         distance: "m"
-      }
+      },
+      suggestions: []
     };
   },
   computed: {
@@ -191,6 +196,12 @@ export default {
     wrapperClasses() {
       let cls = ["zoom-" + this.zoomInt];
       return cls;
+    },
+    hasSuggestions() {
+      return this.suggestions.length > 0 && this.suggestions[0] instanceof Object;
+    },
+    suggestionsClasses() {
+      return this.hasSuggestions ? ['show'] : ['hide'];
     }
   },
   filters: {
@@ -339,6 +350,16 @@ export default {
       const params = { lng, lat };
       this.findZoneData(params);
     },
+    isUK() {
+      const { c, lat, lng, n } = this.zone;
+      if (typeof c === 'string' && c.length > 0 && lat !== 0 && lng !== 0 && lat !== undefined) {
+        return typeof n === 'number' && n > 0;
+      } else {
+        const [x, y] = this.selected;
+        return (x > -10 && x < 3 && y > 49.4 && y < 61 )
+      }
+      
+    },
     findZoneData(coords) {
       this.zonePlace = "";
       this.zone = zoneSchema;
@@ -362,12 +383,46 @@ export default {
         }
       }
     },
+    goToNearest(item) {
+     if (item instanceof Object) {
+      this.suggestions = [];
+      const { lat, lng } = item;
+      const ck =
+        "near_" + parseFloat(lat).toFixed(6) + parseFloat(lng).toFixed(6);
+      fetchNearest(item).then(d => {
+        this.handleZoneData(d,true, ck);
+      });
+     }
+    },
+    getSuggestions() {
+      const str = this.search.trim();
+      if (str.length > 1) {
+        const ck = `sug_${str.toLowerCase()}`;
+        const data = this.$ls.get(ck);
+        if (data instanceof Array && data.length > 0) {
+          this.suggestions = data;
+        } else {
+          fetchSugegstions(this.search).then(result => {
+            if (result instanceof Array) {
+              const num = result.length;
+              if (num === 1) {
+                this.goToNearest(result[0]);
+              } else if (num > 1) {
+                this.suggestions = result;
+                this.$ls.set(ck, result, 3 * 24 * 3600 * 1000);
+              }
+            }
+          })
+        }
+      }
+    },
     fetchByPc() {
-      if (this.search.length > 4) {
+      this.suggestions = [];
+      if (this.search.length > 2) {
         this.zonePlace = "";
         this.zone = zoneSchema;
         const pc = this.search.trim().toUpperCase();
-        if (validUKPostcode(pc) && pc !== this.zone.pc.trim().toUpperCase()) {
+        if (this.isUK() && this.search.length > 4 && validUKPostcode(pc) && pc !== this.zone.pc.trim().toUpperCase()) {
           const ck = "pc_" + pc.replace(/\s/, "_");
           const data = this.$ls.get(ck);
           if (data instanceof Object && data.valid) {
@@ -376,6 +431,20 @@ export default {
             fetchSurrounding(pc).then(d => {
               this.handleZoneData(d, true, ck);
             });
+          }
+        } else {
+          this.getSuggestions();
+        }
+      }
+    },
+    checkSuggestions(e) {
+      if (e.key) {
+        const key = e.key.toLowerCase();
+        if (['backspace', 'enter', 'meta', 'arrowleft','arrowright', 'arrowup', 'arrowdown'].includes(key) === false) {
+          if (this.search.length > 1 && !validUKPostcode(this.search) && !/^[A-Z][A-Z0-9]+/.test(this.search)) {
+            this.getSuggestions();
+          } else {
+            this.suggestions = [];
           }
         }
       }
@@ -485,23 +554,11 @@ export default {
       }
     },
     setZone(zone) {
-      if (zone.pc.length > 1 || zone.pn.length > 0) {
+      if (zone instanceof Object && typeof zone.c === "string" && zone.c.length > 0)  {
         this.zone = zone;
-        this.search = zone.pc;
-        if (validUKPostcode(zone.pc)) {
-          setTimeout(() => {
-            if (!this.hasAddresses) {
-              const { pc } = this.zone;
-              fetchAddresses(pc).then(d2 => {
-                if (d2.matched) {
-                  if (d2.zone.addresses instanceof Array) {
-                    this.zone.addresses = d2.zone.addresses;
-                  }
-                }
-              });
-            }
-          }, 500);
-        }
+      }
+      if (zone.pc.length > 1 || zone.pn.length > 0) {
+        this.search = validUKPostcode(zone.pc)? zone.pc : zone.lc;
       }
     }
   }

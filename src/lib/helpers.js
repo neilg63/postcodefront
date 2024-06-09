@@ -21,16 +21,39 @@ export const isNumeric = inval => {
   return valid;
 }
 
-export const toDistUnits = (km, unit) => {
+export const toYrdsMiles = (fv, multiplier) => {
+  const yrds = fv * (multiplier / 0.9144);
+  if (yrds < 1760) {
+    return  Math.round(yrds) + " yds";
+  } else if (yrds < 17600) {
+    return  (Math.round(yrds / 176) / 10) + " miles";
+  } else {
+    return Math.round(yrds / 1760) + " miles";
+  }
+}
+
+export const toMetresKm = (fv, multiplier) => {
+  const ms = fv * multiplier;
+  if (ms < 2000) {
+    return Math.round(ms) + " m.";
+  } else if (ms < 19000) {
+    return  (Math.round(ms / 100) / 10) + " km.";
+  } else {
+    return Math.round(ms / 1000) + " km.";
+  }
+}
+
+export const toDistUnits = (m, unit, kmMode = false) => {
   let str = "";
-  if (isNumeric(km)) {
-    const fv = parseFloat(km);
+  const multiplier = kmMode ? 1000 : 1;
+  if (isNumeric(m)) {
+    const fv = parseFloat(m);
     switch (unit) {
       case 'yards':
-        str = Math.round(fv * (1000 / 0.9144)) + " yds";
+        str = toYrdsMiles(fv, multiplier);
         break;
       default:
-        str = Math.round(fv * 1000) + " m.";
+        str = toMetresKm(fv, multiplier);
         break;
     }
   }

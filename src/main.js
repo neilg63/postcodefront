@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueLayers from 'vuelayers'
 import Storage from 'vue-ls';
-import 'vuelayers/lib/style.css' // needs css-loader
+import 'vuelayers/dist/vuelayers.min.css' // needs css-loader
 import App from './App.vue'
 import VueFilterDateFormat from 'vue-filter-date-format';
 
