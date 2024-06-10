@@ -172,3 +172,9 @@ export const toISOUtcDateString = (dtStr = "") => {
   }
   
 }
+
+export const isApprox = (v1 = 0, v2 = 0, decimals = 3) => {
+  const v1Apr = Math.round(v1 * decimals) / decimals;
+  const v2Apr = Math.round(v2 * decimals) / decimals;
+  return v1Apr === v2Apr;
+}

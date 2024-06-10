@@ -82,6 +82,9 @@
       :wikipedia="wikipedia"
       :geonames="geonames"
     />
+    <div class="loading-overlay" :class="loadingClasses">
+      <img src="/images/spinning-wheel.svg" height="160" width="160" />
+    </div>
   </section>
 </template>
 
@@ -95,7 +98,8 @@ import {
   fetchGeo,
   isNumeric,
   cleanString,
-  validUKPostcode
+  validUKPostcode,
+  isApprox
 } from "../lib/helpers";
 import { fetchNearest, fetchSugegstions, fetchSurrounding } from "../api/fetch";
 import DetailPanes from "./DetailPanes";
@@ -129,7 +133,8 @@ export default {
         degrees: "dms",
         distance: "m"
       },
-      suggestions: []
+      suggestions: [],
+      loading: false,
     };
   },
   computed: {
@@ -202,6 +207,9 @@ export default {
     },
     suggestionsClasses() {
       return this.hasSuggestions ? ['show'] : ['hide'];
+    },
+    loadingClasses() {
+      return this.loading ? ['loading'] : ['not-loading'];
     }
   },
   filters: {
@@ -385,6 +393,7 @@ export default {
     },
     goToNearest(item) {
      if (item instanceof Object) {
+      this.loading = true;
       this.suggestions = [];
       const { lat, lng } = item;
       const ck =
@@ -406,7 +415,15 @@ export default {
             if (result instanceof Array) {
               const num = result.length;
               if (num === 1) {
-                this.goToNearest(result[0]);
+                const { lat, lng } = result[0];
+                if (typeof lat === 'number' && typeof lng === 'number') {
+                  const [x, y] = this.selected;
+                  const isSame = isApprox(y, lat) && isApprox(x, lng);
+                  if (!isSame) {
+                    this.goToNearest(result[0]);
+                  }
+                }
+                
               } else if (num > 1) {
                 this.suggestions = result;
                 this.$ls.set(ck, result, 3 * 24 * 3600 * 1000);
@@ -425,6 +442,7 @@ export default {
         if (this.isUK() && this.search.length > 4 && validUKPostcode(pc) && pc !== this.zone.pc.trim().toUpperCase()) {
           const ck = "pc_" + pc.replace(/\s/, "_");
           const data = this.$ls.get(ck);
+          this.loading = true;
           if (data instanceof Object && data.valid) {
             this.handleZoneData(data, true);
           } else {
@@ -450,6 +468,7 @@ export default {
       }
     },
     handleZoneData(d, recenter, ck) {
+      this.loading = false;
       if (d instanceof Object) {
         this.zone = zoneSchema;
         this.geonames = [];
@@ -558,7 +577,11 @@ export default {
         this.zone = zone;
       }
       if (zone.pc.length > 1 || zone.pn.length > 0) {
-        this.search = validUKPostcode(zone.pc)? zone.pc : zone.lc;
+        const newSearch = validUKPostcode(zone.pc)? zone.pc : zone.lc;
+        const oldSearch = this.search.trim();
+        if (newSearch !== oldSearch) {
+          this.search = newSearch;
+        }
       }
     }
   }
